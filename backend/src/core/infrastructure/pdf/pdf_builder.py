@@ -465,25 +465,51 @@ class PDFBuilder:
         p._bookmarkName = title.replace(" ", "_")
         self._story.append(p)
 
+    # Approximate maximum lines per PDF page at the given font size.
+    # Calculated as: (A4 height - margins - header - footer) / line_height
+    # = (841pt - 30pt top - 30pt bottom - 28pt header - 25pt footer) / (font_size * 1.4)
+    # Using a conservative factor of 0.75 for safety margin.
+    def _max_lines_per_page(self) -> int:
+        usable_pts = 841 - 113  # A4 height minus all reserved space
+        line_height = self.font_size * 1.4
+        return max(30, int((usable_pts / line_height) * 0.75))
+
     def add_source_file(
         self,
         file_info: dict,
         content: str,
         language: str = "text",
     ) -> None:
-        """Add a source code file to the PDF."""
+        """Add a source code file to the PDF.
+
+        Large files are split into page-sized chunks to prevent ReportLab
+        LayoutError ('Flowable too large on page').
+        """
+        lines = content.split("\n")
+        max_lines = self._max_lines_per_page()
+
         self._story.append(PageBreak())
         self._story.append(FileHeaderBlock(file_info, self.theme))
         self._story.append(Spacer(1, 0.3 * cm))
-        self._story.append(
-            SyntaxCodeBlock(
-                code=content,
-                language=language,
-                theme=self.theme,
-                font_size=self.font_size,
-                show_line_numbers=self.show_line_numbers,
+
+        # Split into chunks that fit on a single page
+        for chunk_start in range(0, len(lines), max_lines):
+            chunk = lines[chunk_start:chunk_start + max_lines]
+            if chunk_start > 0:
+                # Subsequent chunks: new page, no repeated header
+                self._story.append(PageBreak())
+
+            # Adjust line numbering so it reflects the actual source line numbers
+            chunk_content = "\n".join(chunk)
+            self._story.append(
+                SyntaxCodeBlock(
+                    code=chunk_content,
+                    language=language,
+                    theme=self.theme,
+                    font_size=self.font_size,
+                    show_line_numbers=self.show_line_numbers,
+                )
             )
-        )
 
     def add_csv_preview(
         self,

@@ -153,3 +153,5 @@ class TestPDFBuilder:
         assert PDFBuilder._format_size(2048) == "2.0 KB"
         assert PDFBuilder._format_size(1_500_000) == "1.4 MB"
         assert PDFBuilder._format_size(2_000_000_000) == "1.86 GB"
+
+        
