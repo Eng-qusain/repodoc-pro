@@ -172,5 +172,3 @@ class AIDocumenter:
             "complexity": "Unknown",
             "notes": f"Language detected: {language}. AI features are optional — all PDF export features work without an API key.",
         }
-    
-    

@@ -6,7 +6,7 @@ let _port = 8765;
 
 // Allow dynamic port resolution from Electron
 if (typeof window !== 'undefined' && window.electron) {
-  window.electron.getBackendPort().then((p) => { if (p) _port = p; });
+  window.electron.getBackendPort().then((p: number) => { if (p) _port = p; });
 }
 
 export const apiClient = axios.create({

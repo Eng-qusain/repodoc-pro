@@ -10,7 +10,7 @@ from __future__ import annotations
 import logging
 import os
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 from fastapi import APIRouter, HTTPException
 
@@ -289,7 +289,7 @@ async def search_files(
     if not root.exists():
         raise HTTPException(status_code=404, detail="Project path not found")
 
-    results = []
+    results: list[dict[str, Union[str, int]]] = []
     query_lower = query.lower()
 
     for dirpath, dirnames, filenames in os.walk(root):
