@@ -195,8 +195,8 @@ class FileHeaderBlock(Flowable):
         super().__init__()
         self.file_info = file_info
         self.theme = theme
-        self.height = 70
-        self.width = 500
+        self.height: float = 70
+        self.width: float = 500
 
     def wrap(self, available_width: float, available_height: float) -> tuple[float, float]:
         self.width = available_width
