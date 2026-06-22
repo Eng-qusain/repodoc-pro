@@ -46,13 +46,14 @@ jobs:
         run: |
           pip install ruff mypy
           ruff check src/
-          mypy src/ --ignore-missing-imports
+          PYTHONPATH=src mypy src/ --ignore-missing-imports
 
       - name: Run tests
         working-directory: backend
         run: pytest --cov=src --cov-report=xml --cov-fail-under=80
         env:
           REPODOC_ENV: test
+          PYTHONPATH: src
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
